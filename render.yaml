@@ -1,0 +1,61 @@
+# ================================================================
+# COZY DEN HostelOS - Render Blueprint Infrastructure
+# ================================================================
+# Deploy automatically by linking GitHub repository: cozy-den-hostelos
+
+services:
+  # --------------------------------------------------------------
+  # 1. COZY DEN AI API & Interactive Web Service
+  # --------------------------------------------------------------
+  # Exposes /search-memory, /index-memory, /trigger-escalation, /chat
+  - type: web
+    name: cozy-den-ai-api
+    runtime: docker
+    dockerfilePath: ./backend-workers/Dockerfile
+    dockerContext: ./backend-workers
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: BACKEND_API_KEY
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
+      - key: ESCALATION_HOURS_THRESHOLD
+        value: "48"
+      - key: FACE_MATCH_THRESHOLD
+        value: "0.72"
+
+  # --------------------------------------------------------------
+  # 2. COZY DEN Standalone Background AI Worker Daemon
+  # --------------------------------------------------------------
+  # Continuously processes newly uploaded photos & 48h complaint escalations
+  - type: worker
+    name: cozy-den-ai-worker
+    runtime: docker
+    dockerfilePath: ./backend-workers/Dockerfile
+    dockerContext: ./backend-workers
+    dockerCommand: python worker.py
+    plan: starter
+    region: oregon
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ENVIRONMENT
+        value: production
+      - key: ESCALATION_HOURS_THRESHOLD
+        value: "48"
+      - key: DREAMCAST_POLL_INTERVAL_SECONDS
+        value: "60"
