@@ -98,24 +98,7 @@ export default function HostelMemoryGame() {
     }
   }, []);
 
-  // Keyboard controls
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space' || e.code === 'ArrowUp' || e.key === 'w') {
-        e.preventDefault();
-        if (!isPlaying && !isGameOver) {
-          startGame();
-        } else if (isPlaying) {
-          jump();
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPlaying, isGameOver, jump]);
-
-  const startGame = () => {
+  const startGame = useCallback(() => {
     gameState.current = {
       playerY: 200,
       playerX: 60,
@@ -134,7 +117,24 @@ export default function HostelMemoryGame() {
     setIsGameOver(false);
     setIsPlaying(true);
     setUnlockedMemories([]);
-  };
+  }, []);
+
+  // Keyboard controls
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' || e.code === 'ArrowUp' || e.key === 'w') {
+        e.preventDefault();
+        if (!isPlaying && !isGameOver) {
+          startGame();
+        } else if (isPlaying) {
+          jump();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPlaying, isGameOver, jump, startGame]);
 
   // Main Game Loop
   useEffect(() => {
