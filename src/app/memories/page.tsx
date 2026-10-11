@@ -1,40 +1,56 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import MemoriesWall from '@/components/memories/MemoriesWall';
-import { Heart, Sparkles, Camera, Users, VideoOff } from 'lucide-react';
+import { Heart, Sparkles, Camera, Users, VideoOff, ArrowRight } from 'lucide-react';
+import { sound } from '@/lib/sound';
 
 export default function MemoriesPage() {
   return (
-    <div className="mx-auto max-w-7xl space-y-8 py-4">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 space-y-16">
       
-      {/* Page Header Banner */}
-      <div className="rounded-3xl border border-white/10 bg-gradient-to-r from-pink-950/60 via-slate-900/80 to-purple-950/50 p-6 sm:p-8 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
-        <div className="relative z-10 space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-pink-500/20 px-3 py-1 text-xs font-semibold text-pink-300 border border-pink-500/30 flex items-center gap-1.5">
-              <Heart className="h-3.5 w-3.5 text-pink-400 fill-pink-400" />
-              <span>Cozy Memories Vault</span>
-            </span>
-            <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-[10px] text-amber-300 font-bold border border-amber-500/30 flex items-center gap-1">
-              <VideoOff className="h-3 w-3" />
-              <span>Strictly Photos Only (No Videos)</span>
-            </span>
+      {/* =========================================================================
+          HERO & SOUL OF COZY DEN
+         ========================================================================= */}
+      <section className="space-y-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono uppercase tracking-widest text-pink-400">
+                DreamCast Rooftop Memory Vault
+              </span>
+              <span className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] text-amber-300 font-medium">
+                Photos Only
+              </span>
+            </div>
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+              Moments That Turn Four Walls Into Home.
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-300 font-light leading-relaxed">
+              From impromptu rooftop guitar jam sessions under the Bhopal sky to midnight chai in the courtyard 
+              and hostel festival feasts — every photograph here captures the authentic soul of living together.
+            </p>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black text-white">
-            Hostel Life Photo Memories
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-            Welcome to the community photo wall of COZY DEN. Browse authentic moments from our rooms,
-            central atrium, evening terrace guitar jams, mess laughter, and campus walks.
-            Upload your memories to keep them alive forever.
-          </p>
+          <Link
+            href="/picbot"
+            onClick={() => sound.playClick()}
+            className="flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 px-6 py-3 text-xs font-bold text-white shadow-xl shadow-pink-600/25 hover:opacity-90 transition-all shrink-0"
+          >
+            <Sparkles className="h-4 w-4" />
+            <span>Launch AI Face Search (PicBot)</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
-      </div>
+      </section>
 
-      {/* Main Interactive Memories Wall */}
-      <MemoriesWall />
+      {/* =========================================================================
+          INTERACTIVE MEMORIES PHOTO WALL
+         ========================================================================= */}
+      <section>
+        <MemoriesWall />
+      </section>
 
     </div>
   );

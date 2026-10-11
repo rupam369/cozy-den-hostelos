@@ -2,124 +2,130 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Building2, Heart, Shield, Phone, Gamepad2, Sparkles, MapPin, Radio } from 'lucide-react';
+import { Building2, Heart, Shield, Phone, Sparkles, MapPin, Radio, Compass } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 
 export default function Footer() {
   const { healthScores } = useApp();
 
   return (
-    <footer className="mt-20 border-t border-white/10 bg-slate-950/80 backdrop-blur-2xl">
-      <div className="mx-auto max-w-7xl px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="mt-32 border-t border-white/[0.08] bg-gradient-to-b from-transparent via-[#070b18]/80 to-[#040711] backdrop-blur-2xl">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           
-          {/* Brand & Vision */}
-          <div className="md:col-span-1 space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white shadow-lg">
+          {/* Brand & Architectural Vision */}
+          <div className="md:col-span-1 space-y-4">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400">
                 <Building2 className="h-4 w-4" />
               </div>
-              <span className="text-base font-extrabold tracking-wider text-white">COZY DEN</span>
+              <span className="text-base font-bold tracking-wider text-white">COZY DEN</span>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Where modern living meets hostel soul. A multi-layer digital experience crafted for 
-              residents, mentors, and management.
+            <p className="text-xs text-slate-400 leading-relaxed font-light">
+              A digital sanctuary where architectural beauty meets real hostel soul. 
+              Built for residents, mentors, and staff.
             </p>
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <Radio className="h-3 w-3 text-emerald-400 animate-pulse" />
-              <span>Smart IoT Grid: 99.9% uptime</span>
+            <div className="flex items-center gap-2 text-xs text-slate-400 pt-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[11px] font-mono tracking-wide">Campus Residence Online</span>
             </div>
           </div>
 
-          {/* Quick Hub Portals */}
+          {/* Core Sanctuaries */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-3">Living Portals</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+            <h4 className="text-xs font-semibold uppercase tracking-widest text-slate-300 mb-4">
+              Hostel Spaces
+            </h4>
+            <ul className="space-y-2.5 text-xs text-slate-400 font-light">
               <li>
-                <Link href="/student" className="hover:text-blue-400 transition-colors">
-                  Student Dashboard
+                <Link href="/student" className="hover:text-amber-300 transition-colors">
+                  My Hostel Suite
                 </Link>
               </li>
               <li>
-                <Link href="/management" className="hover:text-blue-400 transition-colors">
-                  Management Control Room
+                <Link href="/food" className="hover:text-amber-300 transition-colors">
+                  The Dining Hall &amp; Menu
                 </Link>
               </li>
               <li>
-                <Link href="/teacher" className="hover:text-blue-400 transition-colors">
-                  Teacher & Warden Desk
+                <Link href="/complaints" className="hover:text-amber-300 transition-colors">
+                  Grievance &amp; 48h Escalation
                 </Link>
               </li>
               <li>
-                <Link href="/food" className="hover:text-blue-400 transition-colors">
-                  Mess Menu & Food Ratings
+                <Link href="/memories" className="hover:text-amber-300 transition-colors">
+                  DreamCast Photo Lounge
                 </Link>
               </li>
               <li>
-                <Link href="/complaints" className="hover:text-blue-400 transition-colors">
-                  Grievance & Escalation Center
+                <Link href="/ai-assistant" className="hover:text-amber-300 transition-colors">
+                  Cozy Assistant AI
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Nostalgic Memory Corner & AI */}
+          {/* Living Details */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-3">Hostel Soul</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+            <h4 className="text-xs font-semibold uppercase tracking-widest text-slate-300 mb-4">
+              Daily Living
+            </h4>
+            <ul className="space-y-2.5 text-xs text-slate-400 font-light">
               <li>
-                <Link href="/game" className="flex items-center gap-1.5 text-amber-400 hover:text-amber-300 transition-colors font-medium">
-                  <Gamepad2 className="h-3.5 w-3.5" />
-                  <span>Hostel Life Memory Game (8-Bit)</span>
+                <Link href="/announcements" className="hover:text-amber-300 transition-colors">
+                  Digital Bulletin Notices
                 </Link>
               </li>
               <li>
-                <Link href="/ai-assistant" className="flex items-center gap-1.5 hover:text-purple-400 transition-colors">
-                  <Sparkles className="h-3.5 w-3.5 text-purple-400" />
-                  <span>Ask Cozy Assistant</span>
+                <Link href="/profile" className="hover:text-amber-300 transition-colors">
+                  Digital Resident Pass
                 </Link>
               </li>
               <li>
-                <Link href="/announcements" className="hover:text-blue-400 transition-colors">
-                  Campus Digital Bulletin
+                <Link href="/game" className="hover:text-amber-300 transition-colors">
+                  Hostel Nostalgia Game (8-Bit)
                 </Link>
               </li>
               <li>
-                <span className="inline-block rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 text-[11px] text-emerald-400">
-                  Hostel Health Score: {healthScores.overall}/100
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 px-3 py-1 text-[11px] text-amber-300 mt-1 font-medium">
+                  Hostel Health: {healthScores.overall}/100
                 </span>
               </li>
             </ul>
           </div>
 
-          {/* Emergency & Safe Harbor */}
+          {/* 24/7 Care & Support */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-3">24/7 Safe Harbor</h4>
-            <div className="space-y-2 text-xs text-slate-400">
+            <h4 className="text-xs font-semibold uppercase tracking-widest text-slate-300 mb-4">
+              24/7 Resident Care
+            </h4>
+            <div className="space-y-2.5 text-xs text-slate-400 font-light">
               <div className="flex items-center gap-2">
-                <Phone className="h-3.5 w-3.5 text-rose-400" />
-                <span className="font-semibold text-rose-400">Emergency SOS: +91 99887 76655</span>
+                <Phone className="h-3.5 w-3.5 text-amber-400" />
+                <span className="text-slate-300 font-medium">Health Pod / Warden Desk: Ext. 108</span>
               </div>
               <div className="flex items-center gap-2">
                 <Shield className="h-3.5 w-3.5 text-blue-400" />
-                <span>Warden Cabin: Ground Floor, Wing A</span>
+                <span>Head Warden Dr. Anita Desai (+91 98765-43210)</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="h-3.5 w-3.5 text-amber-400" />
-                <span>Night Curfew: 10:30 PM (Bio-metric Gate)</span>
+                <MapPin className="h-3.5 w-3.5 text-rose-400" />
+                <span>Main Gate Curfew: 10:00 PM</span>
               </div>
             </div>
           </div>
 
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-10 border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© 2026 COZY DEN. Engineered with Next.js, Three.js & Supabase.</p>
-          <div className="flex items-center gap-1">
-            <span>Crafted for real hostel memories with</span>
-            <Heart className="h-3.5 w-3.5 text-rose-500 fill-rose-500" />
-            <span>& spatial vision</span>
+        {/* Bottom Credits */}
+        <div className="mt-14 border-t border-white/[0.06] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 font-light">
+          <p>© 2026 COZY DEN HostelOS. Built for student dignity, warmth &amp; community.</p>
+          <div className="flex items-center gap-1.5">
+            <span>Render AI Workers</span>
+            <span>•</span>
+            <span>Supabase Realtime</span>
+            <span>•</span>
+            <span className="text-amber-400">Warm Hostel Lights</span>
           </div>
         </div>
       </div>

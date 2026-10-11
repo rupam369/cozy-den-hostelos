@@ -245,23 +245,23 @@ export default function ManagementDashboardPage() {
     <div className="mx-auto max-w-7xl space-y-8 py-4 px-2 sm:px-4">
       
       {/* Management Control Header */}
-      <div className="rounded-3xl border border-white/10 bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-blue-950/60 p-6 sm:p-8 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+      <div className="vision-glass rounded-3xl p-6 sm:p-8 relative overflow-hidden border border-white/[0.08]">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+              <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>COZY DEN HostelOS Admin Headquarters</span>
+                <span>Executive Command Center • Sector 4</span>
               </span>
-              <span className="rounded-full bg-blue-500/20 px-2.5 py-0.5 text-[10px] text-blue-300 font-bold">
-                Role-Based Access: Management Member
+              <span className="rounded-full bg-amber-500/15 px-2.5 py-0.5 text-[10px] text-amber-300 font-bold border border-amber-500/30">
+                Management Member
               </span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-black text-white">
               Hostel Operations &amp; Facility Command
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300">
-              Logged in as <strong className="text-white">{currentUser.full_name}</strong> ({currentUser.position}). Overseeing 5-floor building, resident well-being, and digital twin telemetry.
+            <p className="text-xs sm:text-sm text-slate-300 font-light">
+              Logged in as <strong className="text-white font-semibold">{currentUser.full_name}</strong> ({currentUser.position}). Overseeing building operations, resident welfare, and 3D digital twin telemetry.
             </p>
           </div>
 
@@ -284,22 +284,22 @@ export default function ManagementDashboardPage() {
         </div>
 
         {/* 5 ADMIN TOOL SWITCHER TABS */}
-        <div className="relative z-10 flex items-center gap-2 pt-6 overflow-x-auto border-t border-white/10 mt-6">
+        <div className="relative z-10 flex items-center gap-2 pt-6 overflow-x-auto border-t border-white/[0.08] mt-6">
           
           <button
             onClick={() => {
               sound.playClick();
               setActiveTab('complaints');
             }}
-            className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all whitespace-nowrap ${
               activeTab === 'complaints'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 ring-1 ring-blue-400'
-                : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
+                : 'bg-white/[0.05] text-slate-300 hover:bg-white/[0.1] hover:text-white'
             }`}
           >
-            <Activity className="h-4 w-4" />
+            <Activity className="h-3.5 w-3.5" />
             <span>Facility Radar &amp; Grievances</span>
-            <span className="rounded-full bg-white/20 px-2 py-0.2 text-[10px]">
+            <span className="rounded-full bg-black/20 px-1.5 py-0.2 text-[10px]">
               {complaints.filter((c) => c.status !== 'Resolved').length}
             </span>
           </button>
@@ -309,15 +309,15 @@ export default function ManagementDashboardPage() {
               sound.playClick();
               setActiveTab('users');
             }}
-            className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all whitespace-nowrap ${
               activeTab === 'users'
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 ring-1 ring-indigo-400'
-                : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
+                : 'bg-white/[0.05] text-slate-300 hover:bg-white/[0.1] hover:text-white'
             }`}
           >
-            <Users className="h-4 w-4" />
-            <span>User &amp; Resident Directory</span>
-            <span className="rounded-full bg-white/20 px-2 py-0.2 text-[10px]">
+            <Users className="h-3.5 w-3.5" />
+            <span>Resident Directory</span>
+            <span className="rounded-full bg-black/20 px-1.5 py-0.2 text-[10px]">
               {users.length}
             </span>
           </button>
@@ -327,15 +327,15 @@ export default function ManagementDashboardPage() {
               sound.playClick();
               setActiveTab('memories');
             }}
-            className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all whitespace-nowrap ${
               activeTab === 'memories'
-                ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30 ring-1 ring-purple-400'
-                : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
+                : 'bg-white/[0.05] text-slate-300 hover:bg-white/[0.1] hover:text-white'
             }`}
           >
-            <ImageIcon className="h-4 w-4" />
+            <ImageIcon className="h-3.5 w-3.5" />
             <span>Memory Moderation</span>
-            <span className="rounded-full bg-white/20 px-2 py-0.2 text-[10px]">
+            <span className="rounded-full bg-black/20 px-1.5 py-0.2 text-[10px]">
               {picBotMemories.length}
             </span>
           </button>
@@ -345,15 +345,15 @@ export default function ManagementDashboardPage() {
               sound.playClick();
               setActiveTab('broadcast');
             }}
-            className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all whitespace-nowrap ${
               activeTab === 'broadcast'
-                ? 'bg-amber-600 text-white shadow-lg shadow-amber-500/30 ring-1 ring-amber-400'
-                : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
+                : 'bg-white/[0.05] text-slate-300 hover:bg-white/[0.1] hover:text-white'
             }`}
           >
-            <Bell className="h-4 w-4" />
+            <Bell className="h-3.5 w-3.5" />
             <span>Notice Broadcaster</span>
-            <span className="rounded-full bg-white/20 px-2 py-0.2 text-[10px]">
+            <span className="rounded-full bg-black/20 px-1.5 py-0.2 text-[10px]">
               {announcements.length}
             </span>
           </button>

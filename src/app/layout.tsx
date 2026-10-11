@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/context/AppContext';
 import Navbar from '@/components/navigation/Navbar';
@@ -7,14 +6,9 @@ import Footer from '@/components/navigation/Footer';
 import CozyAssistantWidget from '@/components/chat/CozyAssistantWidget';
 import NotificationToasts from '@/components/notifications/NotificationToasts';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-sans',
-});
-
 export const metadata: Metadata = {
-  title: 'COZY DEN — Real 3D Hostel Digital Experience Platform',
-  description: 'A futuristic, premium, multi-layer hostel management platform combining Apple Vision Pro spatial UI, smart building IoT metrics, modern mess systems, and nostalgic hostel soul.',
+  title: 'COZY DEN — Digital Hostel Sanctuary',
+  description: 'An immersive digital hostel experience fusing Apple Vision Pro spatial elegance, warm hostel lights, real 3D digital twin architecture, and smart campus living.',
 };
 
 export default function RootLayout({
@@ -23,19 +17,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} h-full dark`}>
-      <body className="min-h-full flex flex-col bg-slate-950 text-slate-100 font-sans selection:bg-blue-500 selection:text-white antialiased">
+    <html lang="en" className="h-full dark">
+      <body className="min-h-full flex flex-col bg-[#040711] text-slate-100 font-sans selection:bg-amber-500/30 selection:text-amber-200 antialiased">
         <AppProvider>
-          {/* Spatial Ambient Background Lights */}
+          {/* Spatial Warm Hostel Ambient Lights */}
           <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-            <div className="absolute -top-40 -left-40 h-[600px] w-[600px] rounded-full bg-blue-600/10 blur-[140px]" />
-            <div className="absolute top-1/3 -right-40 h-[700px] w-[700px] rounded-full bg-purple-600/10 blur-[150px]" />
-            <div className="absolute -bottom-40 left-1/3 h-[500px] w-[500px] rounded-full bg-emerald-600/10 blur-[130px]" />
+            {/* Top right warm lantern glow */}
+            <div className="absolute -top-32 right-1/4 h-[550px] w-[550px] rounded-full bg-amber-500/[0.07] blur-[160px]" />
+            {/* Mid deep navy indigo glow */}
+            <div className="absolute top-1/2 -left-32 h-[700px] w-[700px] rounded-full bg-blue-600/[0.05] blur-[180px]" />
+            {/* Bottom warm copper glow */}
+            <div className="absolute -bottom-32 right-10 h-[600px] w-[600px] rounded-full bg-orange-600/[0.04] blur-[150px]" />
           </div>
 
           <div className="relative z-10 flex min-h-screen flex-col">
             <Navbar />
-            <main className="flex-1 px-4 py-4">{children}</main>
+            <main className="flex-1">{children}</main>
             <Footer />
             {/* Real-time Animated Notification Toasts */}
             <NotificationToasts />

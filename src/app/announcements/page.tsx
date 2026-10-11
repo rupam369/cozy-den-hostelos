@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
-import { Megaphone, Plus, Bell, Calendar, Tag, AlertTriangle, ShieldCheck, Sparkles, Send } from 'lucide-react';
+import { Megaphone, Plus, Bell, Calendar, Tag, AlertTriangle, ShieldCheck, Sparkles, Send, DoorOpen } from 'lucide-react';
+import { sound } from '@/lib/sound';
 
 export default function AnnouncementsPage() {
   const { announcements, addAnnouncement, currentUser } = useApp();
@@ -15,6 +16,7 @@ export default function AnnouncementsPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
+    sound.playClick();
 
     addAnnouncement({
       title,
@@ -31,159 +33,141 @@ export default function AnnouncementsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 py-4">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 space-y-16">
       
-      {/* Header Banner */}
-      <div className="rounded-3xl border border-white/10 bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-indigo-950/50 p-6 sm:p-8 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="rounded-full bg-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-300 border border-blue-500/30">
-                Official Digital Bulletin
-              </span>
-              <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] text-emerald-300 font-bold">
-                Realtime Sync
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-4xl font-black text-white">
-              Hostel Announcements &amp; Memos
+      {/* Header */}
+      <section className="space-y-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <span className="text-xs font-mono uppercase tracking-widest text-amber-400">
+              Hostel Entrance • Digital Bulletin
+            </span>
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+              Official Campus Announcements
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300">
-              Verified notices from the Chief Warden, Mess Manager, Facility Leads, and Faculty Mentors.
+            <p className="text-xs sm:text-sm text-slate-300 font-light leading-relaxed">
+              Official notices, schedule updates, and emergency directives directly from Head Warden 
+              Dr. Anita Desai, Facility Managers, and Student Floor Representatives.
             </p>
           </div>
 
           <button
-            onClick={() => setIsFormOpen(!isFormOpen)}
-            className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 py-3.5 text-xs sm:text-sm font-bold text-white shadow-xl hover:from-blue-500 hover:to-indigo-500 transition-all w-fit"
+            onClick={() => {
+              sound.playClick();
+              setIsFormOpen(!isFormOpen);
+            }}
+            className="flex items-center gap-2 rounded-full bg-amber-500 hover:bg-amber-400 px-6 py-3 text-xs font-bold text-slate-950 shadow-xl shadow-amber-500/20 transition-all shrink-0"
           >
             <Plus className="h-4 w-4" />
-            <span>Post New Memo</span>
+            <span>{isFormOpen ? 'Close Form' : 'Post Official Notice'}</span>
           </button>
         </div>
-      </div>
+      </section>
 
-      {/* New Memo Form Drawer */}
+      {/* Creation Drawer */}
       {isFormOpen && (
-        <div className="rounded-3xl border border-white/15 bg-slate-900/90 p-6 backdrop-blur-2xl animate-in slide-in-from-top-4 duration-200">
-          <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
-            <Megaphone className="h-4 w-4 text-blue-400" />
-            <span>Publish Official Hostel Notice</span>
-          </h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="sm:col-span-2">
-                <label className="block text-xs font-medium text-slate-300 mb-1">
-                  Notice Headline
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Scheduled Solar Water Heater Maintenance"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-slate-950/80 px-3 py-2 text-xs text-white focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
-                  Urgency Level
-                </label>
-                <select
-                  value={priority}
-                  onChange={(e) => setPriority(e.target.value as any)}
-                  className="w-full rounded-xl border border-white/10 bg-slate-950/80 px-3 py-2 text-xs text-white focus:outline-none"
-                >
-                  <option value="normal">Normal - General Update</option>
-                  <option value="urgent">Urgent - Important Notice</option>
-                  <option value="critical">Critical - Immediate Action</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                Notice Content
-              </label>
-              <textarea
-                rows={3}
+        <form onSubmit={handleSubmit} className="vision-glass-warm rounded-3xl p-6 sm:p-8 space-y-4">
+          <h2 className="text-base font-bold text-white">Broadcast New Notice</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div className="space-y-1">
+              <label className="text-slate-300 font-medium">Notice Title</label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Saturday Rooftop Jam & Acoustic Evening"
+                className="w-full rounded-2xl bg-white/[0.04] border border-white/[0.08] px-4 py-3 text-white focus:outline-none focus:border-amber-400/50"
                 required
-                placeholder="Provide detailed instructions or timeline..."
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-slate-950/80 px-3 py-2 text-xs text-white focus:outline-none"
               />
             </div>
-
-            <div className="flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setIsFormOpen(false)}
-                className="rounded-xl px-4 py-2 text-xs text-slate-400 hover:text-white"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white shadow-lg hover:bg-blue-500 transition-colors flex items-center gap-1.5"
-              >
-                <Send className="h-3.5 w-3.5" />
-                <span>Publish to Bulletin</span>
-              </button>
+            <div className="space-y-1">
+              <label className="text-slate-300 font-medium">Category Tag</label>
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                placeholder="e.g. Culture, WiFi, Examination"
+                className="w-full rounded-2xl bg-white/[0.04] border border-white/[0.08] px-4 py-3 text-white focus:outline-none focus:border-amber-400/50"
+              />
             </div>
-          </form>
-        </div>
+          </div>
+          <div className="space-y-1 text-xs">
+            <label className="text-slate-300 font-medium">Content / Details</label>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={3}
+              placeholder="Full details of the announcement..."
+              className="w-full rounded-2xl bg-white/[0.04] border border-white/[0.08] px-4 py-3 text-white focus:outline-none focus:border-amber-400/50"
+              required
+            />
+          </div>
+          <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-slate-400">Urgency:</span>
+              {(['normal', 'urgent', 'critical'] as const).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPriority(p)}
+                  className={`rounded-full px-3 py-1 text-[11px] font-bold capitalize transition-all ${
+                    priority === p
+                      ? p === 'critical' ? 'bg-rose-600 text-white' : p === 'urgent' ? 'bg-amber-500 text-slate-950' : 'bg-blue-600 text-white'
+                      : 'bg-white/[0.05] text-slate-300 hover:bg-white/[0.1]'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+            <button
+              type="submit"
+              className="rounded-full bg-amber-500 hover:bg-amber-400 px-6 py-2.5 text-xs font-bold text-slate-950 transition-all shadow-lg"
+            >
+              Publish to Bulletin
+            </button>
+          </div>
+        </form>
       )}
 
       {/* Announcements Stream */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {announcements.map((ann) => {
-          const priorityStyle = {
-            normal: 'border-white/10 bg-slate-900/60',
-            urgent: 'border-amber-500/40 bg-amber-950/20',
-            critical: 'border-rose-500/50 bg-rose-950/30 ring-1 ring-rose-500/40',
-          }[ann.priority];
-
-          const priorityBadge = {
-            normal: 'bg-white/10 text-slate-300',
-            urgent: 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
-            critical: 'bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold',
-          }[ann.priority];
-
-          return (
-            <div
-              key={ann.id}
-              className={`rounded-3xl border p-6 backdrop-blur-xl shadow-xl space-y-3 transition-all hover:scale-[1.01] ${priorityStyle}`}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <span className={`rounded-full px-2.5 py-0.5 text-[10px] uppercase font-semibold ${priorityBadge}`}>
-                  {ann.priority}
-                </span>
-                <span className="text-[10px] text-slate-500 flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  <span>{ann.created_at.slice(0, 10)}</span>
+      <section className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {announcements.map((a) => (
+            <div key={a.id} className="vision-glass rounded-3xl p-6 sm:p-7 space-y-4 hover:border-white/[0.15] transition-all">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-white/[0.08] px-3 py-0.5 text-[11px] text-slate-300 font-medium">
+                    {a.tags?.[0] || 'Notice'}
+                  </span>
+                  {a.priority !== 'normal' && (
+                    <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${
+                      a.priority === 'critical' ? 'bg-rose-500/20 text-rose-300' : 'bg-amber-500/20 text-amber-300'
+                    }`}>
+                      {a.priority}
+                    </span>
+                  )}
+                </div>
+                <span className="text-[11px] text-slate-500 font-mono">
+                  {new Date(a.created_at).toLocaleDateString()}
                 </span>
               </div>
 
-              <h3 className="text-base font-bold text-white leading-snug">{ann.title}</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">{ann.content}</p>
+              <div className="space-y-2">
+                <h3 className="text-lg font-bold text-white">{a.title}</h3>
+                <p className="text-xs sm:text-sm text-slate-300 font-light leading-relaxed">
+                  {a.content}
+                </p>
+              </div>
 
-              <div className="border-t border-white/5 pt-3 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-semibold text-white block">{ann.author_name}</span>
-                  <span className="text-[10px] text-blue-400">{ann.author_role}</span>
-                </div>
-                {ann.tags && ann.tags.length > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Tag className="h-3 w-3 text-slate-500" />
-                    <span className="text-[10px] text-slate-400">{ann.tags.join(', ')}</span>
-                  </div>
-                )}
+              <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-400 font-light">
+                <span>By {a.author_name}</span>
+                <span className="text-amber-400/90 font-medium">{a.author_role}</span>
               </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      </section>
 
     </div>
   );

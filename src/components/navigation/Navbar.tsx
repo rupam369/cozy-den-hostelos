@@ -7,334 +7,277 @@ import { useApp } from '@/context/AppContext';
 import { 
   Building2, 
   Bell, 
-  Bot, 
-  Gamepad2, 
-  UserCheck, 
-  UtensilsCrossed, 
-  AlertCircle, 
-  Megaphone, 
-  ShieldAlert, 
-  ChevronDown, 
+  Sparkles, 
   Menu, 
   X,
-  Sparkles,
-  ExternalLink,
-  Camera,
-  LogOut
+  User,
+  ShieldCheck,
+  ChevronDown,
+  AlertTriangle,
+  LogOut,
+  Compass
 } from 'lucide-react';
-import { UserRole, HostelPosition } from '@/types';
-import { supabaseService } from '@/lib/supabaseService';
+import { UserRole } from '@/types';
+import { sound } from '@/lib/sound';
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { currentUser, switchRole, notifications, markAsRead, markAllAsRead } = useApp();
+  const { currentUser, switchRole, notifications, markAllAsRead } = useApp();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
   const redAlertCount = notifications.filter((n) => !n.is_read && n.type === 'red').length;
 
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/student', label: 'Student' },
-    { href: '/teacher', label: 'Teacher' },
-    { href: '/management', label: 'Management' },
-    { href: '/picbot', label: 'PicBot AI', icon: Sparkles, badge: 'Face AI' },
-    { href: '/memories', label: 'Memories', icon: Camera, badge: 'Photos' },
-    { href: '/food', label: 'Food Reviews' },
-    { href: '/complaints', label: 'Complaints' },
-    { href: '/announcements', label: 'Notices' },
-    { href: '/ai-assistant', label: 'AI Assistant', badge: 'Cozy AI' },
-    { href: '/game', label: 'Memory Game', icon: Gamepad2 },
+  // Exact simplified navigation required by user
+  const navItems = [
+    { label: 'Home', href: '/' },
+    { label: 'My Hostel', href: '/student' },
+    { label: 'Food', href: '/food' },
+    { label: 'Issues', href: '/complaints' },
+    { label: 'Memories', href: '/memories' },
+    { label: 'AI Assistant', href: '/ai-assistant' },
+    { label: 'Profile', href: '/profile' },
   ];
 
-  const positionsByRole: Record<UserRole, HostelPosition[]> = {
-    student: ['Room leader', 'Floor representative', 'Resident'],
-    teacher: ['Faculty Advisor', 'Warden'],
-    management: ['Warden', 'Mess manager', 'Admin'],
+  const handleRoleSelect = (role: UserRole) => {
+    sound.playClick();
+    switchRole(role);
+    setIsRoleMenuOpen(false);
+    if (role === 'management') router.push('/management');
+    else if (role === 'teacher') router.push('/teacher');
+    else router.push('/student');
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full px-4 pt-3 pb-2 transition-all">
-      <div className="mx-auto max-w-7xl rounded-2xl border border-white/10 bg-slate-950/70 backdrop-blur-2xl px-4 py-2.5 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)]">
-        <div className="flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 w-full px-3 sm:px-6 pt-3 pb-2 transition-all">
+      <div className="mx-auto max-w-7xl">
+        <div className="vision-pill flex items-center justify-between gap-4 px-4 sm:px-6 py-2.5 rounded-full">
           
-          {/* Logo & Platform Name */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 p-0.5 shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-              <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-slate-950/80 backdrop-blur-sm">
-                <Building2 className="h-5 w-5 text-blue-400 group-hover:text-blue-300 transition-colors" />
-              </div>
+          {/* Brand Emblem */}
+          <Link 
+            href="/" 
+            onClick={() => sound.playClick()}
+            className="flex items-center gap-2.5 group"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-tr from-amber-500/20 to-blue-500/20 border border-white/10 group-hover:border-amber-400/40 transition-colors">
+              <Building2 className="h-4 w-4 text-amber-400 group-hover:scale-110 transition-transform" />
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-extrabold tracking-wider text-white text-base bg-gradient-to-r from-white via-blue-100 to-indigo-200 bg-clip-text text-transparent">
-                  COZY DEN
-                </span>
-                <span className="rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-blue-400 border border-blue-500/30">
-                  Spatial 3D
-                </span>
-              </div>
-              <p className="text-[10px] text-slate-400">Digital Hostel Ecosystem</p>
+            <div className="flex items-center gap-2">
+              <span className="font-bold tracking-wider text-sm sm:text-base text-white">
+                COZY DEN
+              </span>
+              <span className="hidden sm:inline-block h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
             </div>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              const Icon = link.icon;
+          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
               return (
                 <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`relative flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all ${
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => sound.playClick()}
+                  className={`relative px-3.5 py-1.5 text-xs tracking-wide transition-all rounded-full ${
                     isActive
-                      ? 'bg-white/10 text-white shadow-inner font-semibold'
-                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                      ? 'text-white font-semibold bg-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]'
+                      : 'text-slate-300 hover:text-white hover:bg-white/[0.04]'
                   }`}
                 >
-                  {Icon && <Icon className="h-3.5 w-3.5 text-amber-400" />}
-                  <span>{link.label}</span>
-                  {link.badge && (
-                    <span className="rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 px-1.5 py-0.2 text-[9px] font-semibold text-white">
-                      {link.badge}
-                    </span>
-                  )}
+                  <span>{item.label}</span>
                   {isActive && (
-                    <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500" />
+                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 h-0.5 w-3 rounded-full bg-amber-400" />
                   )}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Right Action Suite: Notifications, Role Switcher, Profile */}
+          {/* Right Action Icons: Notification & Profile Role */}
           <div className="flex items-center gap-2">
-
-            {/* Notification Bell with Real-time Alerts */}
+            
+            {/* Notification Bell */}
             <div className="relative">
               <button
                 onClick={() => {
+                  sound.playClick();
                   setIsNotifOpen(!isNotifOpen);
                   setIsRoleMenuOpen(false);
                 }}
-                className={`relative flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 transition-all ${
-                  isNotifOpen
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
-                }`}
-                title="Hostel Live Notifications"
+                className="relative flex h-8 w-8 items-center justify-center rounded-full text-slate-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                title="Notifications"
               >
                 <Bell className="h-4 w-4" />
                 {unreadCount > 0 && (
-                  <span
-                    className={`absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-bold text-white shadow-lg ${
-                      redAlertCount > 0 ? 'bg-red-500 animate-pulse' : 'bg-amber-500'
-                    }`}
-                  >
+                  <span className={`absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold text-white ${
+                    redAlertCount > 0 ? 'bg-rose-500 animate-pulse' : 'bg-amber-500'
+                  }`}>
                     {unreadCount}
                   </span>
                 )}
               </button>
 
-              {/* Notification Popover Dropdown */}
+              {/* Notification Dropdown */}
               {isNotifOpen && (
-                <div className="absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl border border-white/15 bg-slate-900/95 p-3 shadow-2xl backdrop-blur-2xl z-50">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-2.5 mb-2">
+                <div className="absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl vision-glass p-4 text-left shadow-2xl z-50">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
                     <div className="flex items-center gap-2">
-                      <Bell className="h-4 w-4 text-blue-400" />
-                      <span className="text-xs font-semibold uppercase tracking-wider text-white">
-                        Hostel Pulse Alerts
-                      </span>
+                      <span className="text-xs font-semibold text-white">Hostel Radar</span>
+                      {unreadCount > 0 && (
+                        <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-300 font-medium">
+                          {unreadCount} new
+                        </span>
+                      )}
                     </div>
                     {unreadCount > 0 && (
                       <button
                         onClick={markAllAsRead}
-                        className="text-[11px] text-blue-400 hover:text-blue-300 font-medium"
+                        className="text-[10px] text-slate-400 hover:text-white transition-colors"
                       >
                         Mark all read
                       </button>
                     )}
                   </div>
 
-                  <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
+                  <div className="max-h-72 overflow-y-auto divide-y divide-white/[0.04] py-1">
                     {notifications.length === 0 ? (
-                      <p className="py-6 text-center text-xs text-slate-400">No new alerts.</p>
+                      <div className="py-6 text-center text-xs text-slate-400">
+                        No active alerts. All systems serene.
+                      </div>
                     ) : (
-                      notifications.slice(0, 6).map((n) => {
-                        const typeStyles = {
-                          red: 'border-red-500/30 bg-red-950/30 text-red-200',
-                          yellow: 'border-amber-500/30 bg-amber-950/30 text-amber-200',
-                          green: 'border-emerald-500/30 bg-emerald-950/30 text-emerald-200',
-                        }[n.type];
-
-                        const badgeColor = {
-                          red: 'bg-red-500',
-                          yellow: 'bg-amber-500',
-                          green: 'bg-emerald-500',
-                        }[n.type];
-
-                        return (
-                          <div
-                            key={n.id}
-                            onClick={() => markAsRead(n.id)}
-                            className={`cursor-pointer rounded-xl border p-2.5 transition-all hover:bg-white/5 ${typeStyles} ${
-                              !n.is_read ? 'ring-1 ring-white/15' : 'opacity-75'
-                            }`}
-                          >
-                            <div className="flex items-start gap-2">
-                              <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${badgeColor}`} />
-                              <div className="flex-1">
-                                <h4 className="text-xs font-semibold text-white">{n.title}</h4>
-                                <p className="mt-0.5 text-[11px] text-slate-300 leading-relaxed">
-                                  {n.message}
-                                </p>
-                              </div>
-                            </div>
+                      notifications.slice(0, 5).map((n) => (
+                        <div key={n.id} className="py-2.5 space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className={`font-semibold ${n.type === 'red' ? 'text-rose-400' : 'text-slate-200'}`}>
+                              {n.title}
+                            </span>
+                            <span className="text-[10px] text-slate-500">
+                              {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
                           </div>
-                        );
-                      })
+                          <p className="text-[11px] text-slate-300 leading-snug">{n.message}</p>
+                        </div>
+                      ))
                     )}
-                  </div>
-
-                  <div className="mt-2 border-t border-white/10 pt-2 text-center">
-                    <Link
-                      href="/complaints"
-                      onClick={() => setIsNotifOpen(false)}
-                      className="text-xs font-medium text-blue-400 hover:underline flex items-center justify-center gap-1"
-                    >
-                      <span>View All Grievances & Status</span>
-                      <ExternalLink className="h-3 w-3" />
-                    </Link>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Quick Role Switcher (Apple Vision Pro Pill) */}
+            {/* Resident Pill / Role Switcher */}
             <div className="relative">
               <button
                 onClick={() => {
+                  sound.playClick();
                   setIsRoleMenuOpen(!isRoleMenuOpen);
                   setIsNotifOpen(false);
                 }}
-                className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-white hover:bg-white/10 transition-all"
+                className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.08] hover:border-white/[0.18] transition-all"
               >
-                <div className={`h-2 w-2 rounded-full ${
-                  currentUser.role === 'student' ? 'bg-cyan-400' :
-                  currentUser.role === 'teacher' ? 'bg-violet-400' : 'bg-emerald-400'
-                }`} />
-                <span className="capitalize font-medium">{currentUser.role}</span>
-                <span className="hidden sm:inline text-[10px] text-slate-400 font-normal">
-                  ({currentUser.position})
-                </span>
+                <div className="h-6 w-6 rounded-full bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
+                  {currentUser.full_name?.charAt(0) || 'R'}
+                </div>
+                <div className="hidden sm:block text-left text-xs leading-none">
+                  <div className="font-semibold text-white">{currentUser.room_number || 'Room 101'}</div>
+                  <div className="text-[9px] text-amber-400/90 capitalize">{currentUser.role}</div>
+                </div>
                 <ChevronDown className="h-3 w-3 text-slate-400" />
               </button>
 
               {/* Role Dropdown */}
               {isRoleMenuOpen && (
-                <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-white/15 bg-slate-900/95 p-2 shadow-2xl backdrop-blur-2xl z-50">
-                  <p className="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                    Switch Persona View
-                  </p>
-                  {(['student', 'teacher', 'management'] as UserRole[]).map((r) => (
-                    <div key={r} className="mb-1">
+                <div className="absolute right-0 mt-3 w-56 rounded-2xl vision-glass p-2 text-left shadow-2xl z-50">
+                  <div className="px-3 py-2 border-b border-white/[0.08]">
+                    <div className="text-xs font-semibold text-white">{currentUser.full_name}</div>
+                    <div className="text-[10px] text-slate-400">{currentUser.email || 'resident@cozyden.internal'}</div>
+                  </div>
+
+                  <div className="py-1 text-xs">
+                    <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
+                      Switch Role View
+                    </div>
+                    {(['student', 'teacher', 'management'] as UserRole[]).map((role) => (
                       <button
-                        onClick={() => {
-                          switchRole(r);
-                          setIsRoleMenuOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs transition-colors ${
-                          currentUser.role === r
-                            ? 'bg-blue-600 text-white font-semibold'
-                            : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                        key={role}
+                        onClick={() => handleRoleSelect(role)}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left capitalize transition-colors ${
+                          currentUser.role.toLowerCase() === role
+                            ? 'bg-amber-500/15 text-amber-300 font-semibold'
+                            : 'text-slate-300 hover:bg-white/[0.05] hover:text-white'
                         }`}
                       >
-                        <span className="capitalize">{r} Dashboard</span>
-                        {currentUser.role === r && <UserCheck className="h-3.5 w-3.5" />}
+                        <span>{role === 'management' ? 'Management Member' : role}</span>
+                        {currentUser.role.toLowerCase() === role && (
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                        )}
                       </button>
-                    </div>
-                  ))}
-                  <div className="border-t border-white/10 pt-1.5 mt-1 space-y-1">
+                    ))}
+                  </div>
+
+                  <div className="pt-1 border-t border-white/[0.08]">
                     <Link
                       href="/profile"
                       onClick={() => setIsRoleMenuOpen(false)}
-                      className="block rounded-xl px-3 py-1.5 text-xs text-slate-400 hover:text-white hover:bg-white/5 text-center"
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-300 hover:text-white hover:bg-white/[0.05] transition-colors"
                     >
-                      Edit Profile & Position →
+                      <User className="h-3.5 w-3.5 text-slate-400" />
+                      <span>Resident Profile &amp; Pass</span>
                     </Link>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        setIsRoleMenuOpen(false);
-                        await supabaseService.signOut();
-                        router.push('/login');
-                      }}
-                      className="w-full flex items-center justify-center gap-1.5 rounded-xl px-3 py-1.5 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-center"
-                    >
-                      <LogOut className="h-3 w-3" />
-                      <span>Log Out</span>
-                    </button>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Profile Avatar Button */}
-            <Link
-              href="/profile"
-              className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden border border-white/15 bg-gradient-to-tr from-slate-800 to-indigo-900 shadow-md hover:scale-105 transition-transform"
-              title="My Cozy Den Profile"
-            >
-              <span className="text-xs font-bold text-white">
-                {currentUser.full_name.charAt(0)}
-              </span>
-            </Link>
-
-            {/* Mobile Nav Toggle */}
+            {/* Mobile Hamburger Toggle */}
             <button
-              onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
-              className="lg:hidden flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden flex h-8 w-8 items-center justify-center rounded-full text-slate-300 hover:text-white hover:bg-white/[0.06] transition-colors"
             >
-              {isMobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
+
           </div>
+
         </div>
 
-        {/* Mobile Navigation Drawer */}
-        {isMobileNavOpen && (
-          <div className="lg:hidden mt-3 border-t border-white/10 pt-3 pb-1 space-y-1">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsMobileNavOpen(false)}
-                  className={`flex items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition-all ${
-                    isActive
-                      ? 'bg-blue-600 text-white font-semibold'
-                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    {Icon && <Icon className="h-4 w-4 text-amber-400" />}
-                    <span>{link.label}</span>
-                  </div>
-                  {link.badge && (
-                    <span className="rounded-full bg-purple-500/80 px-2 py-0.5 text-[10px] text-white">
-                      {link.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+        {/* Mobile Fullscreen Glass Navigation Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden mt-2 rounded-3xl vision-glass p-5 space-y-3 animate-in fade-in zoom-in-95 duration-200">
+            <nav className="flex flex-col space-y-1">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => {
+                      sound.playClick();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`flex items-center justify-between px-4 py-3 rounded-2xl text-sm transition-all ${
+                      isActive
+                        ? 'bg-amber-500/15 text-amber-300 font-semibold'
+                        : 'text-slate-200 hover:bg-white/[0.05]'
+                    }`}
+                  >
+                    <span>{item.label}</span>
+                    {isActive && <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className="pt-3 border-t border-white/[0.08] flex items-center justify-between px-2 text-xs text-slate-400">
+              <span>{currentUser.room_number} • Wing {currentUser.wing}</span>
+              <span className="text-amber-400 capitalize">{currentUser.role}</span>
+            </div>
           </div>
         )}
+
       </div>
     </header>
   );

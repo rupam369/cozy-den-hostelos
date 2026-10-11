@@ -34,6 +34,7 @@ import {
   Building2
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { TOUR_STOPS, TourStop } from './WalkthroughGuide';
 import { HOSTEL_ROOMS_DATA, HostelRoom } from '@/data/hostelRoomsData';
 import RoomInspectorModal from '@/components/modals/RoomInspectorModal';
@@ -1252,26 +1253,70 @@ export default function HostelCanvas() {
             <div className="flex items-center justify-between pt-2 border-t border-white/10 text-[11px]">
               <span className="text-emerald-400 font-semibold flex items-center gap-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-                <span>IoT Mesh Active</span>
+                <span>Zone Connected</span>
               </span>
-              {selectedZone === 'MESS_AREA' && (
-                <button
-                  onClick={() => setIsMessModalOpen(true)}
-                  className="text-amber-400 hover:underline font-bold text-xs"
+              {selectedZone === 'ENTRANCE' && (
+                <Link
+                  href="/announcements"
+                  className="flex items-center gap-1 rounded-xl bg-amber-500/20 border border-amber-500/40 px-3 py-1 text-xs font-bold text-amber-300 hover:bg-amber-500/30 transition-all shadow-md"
                 >
-                  Open Menu →
-                </button>
+                  <span>Announcements</span>
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
+              )}
+              {selectedZone === 'MESS_AREA' && (
+                <Link
+                  href="/food"
+                  className="flex items-center gap-1 rounded-xl bg-amber-500/20 border border-amber-500/40 px-3 py-1 text-xs font-bold text-amber-300 hover:bg-amber-500/30 transition-all shadow-md"
+                >
+                  <span>Food Reviews</span>
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
               )}
               {selectedZone === 'ROOM_BLOCK' && (
-                <button
-                  onClick={() => {
-                    const r304 = HOSTEL_ROOMS_DATA.find((r) => r.roomNumber.includes('304'));
-                    if (r304) setSelectedRoom(r304);
-                  }}
-                  className="text-blue-400 hover:underline font-bold text-xs"
+                <Link
+                  href="/student"
+                  className="flex items-center gap-1 rounded-xl bg-blue-500/20 border border-blue-500/40 px-3 py-1 text-xs font-bold text-blue-300 hover:bg-blue-500/30 transition-all shadow-md"
                 >
-                  Inspect Suite →
-                </button>
+                  <span>Student Portal</span>
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
+              )}
+              {selectedZone === 'ADMIN_OFFICE' && (
+                <Link
+                  href="/management"
+                  className="flex items-center gap-1 rounded-xl bg-purple-500/20 border border-purple-500/40 px-3 py-1 text-xs font-bold text-purple-300 hover:bg-purple-500/30 transition-all shadow-md"
+                >
+                  <span>Management Dashboard</span>
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
+              )}
+              {selectedZone === 'DREAMCAST_LOUNGE' && (
+                <Link
+                  href="/memories"
+                  className="flex items-center gap-1 rounded-xl bg-pink-500/20 border border-pink-500/40 px-3 py-1 text-xs font-bold text-pink-300 hover:bg-pink-500/30 transition-all shadow-md"
+                >
+                  <span>DreamCast Memories</span>
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
+              )}
+              {selectedZone === 'RECEPTION' && (
+                <Link
+                  href="/announcements"
+                  className="flex items-center gap-1 rounded-xl bg-blue-500/20 border border-blue-500/40 px-3 py-1 text-xs font-bold text-blue-300 hover:bg-blue-500/30 transition-all shadow-md"
+                >
+                  <span>Concierge Desk</span>
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
+              )}
+              {selectedZone === 'COZYDEN_BUILDING' && (
+                <Link
+                  href="/student"
+                  className="flex items-center gap-1 rounded-xl bg-emerald-500/20 border border-emerald-500/40 px-3 py-1 text-xs font-bold text-emerald-300 hover:bg-emerald-500/30 transition-all shadow-md"
+                >
+                  <span>Enter Living Blocks</span>
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
               )}
             </div>
           </div>

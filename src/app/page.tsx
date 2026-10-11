@@ -1,13 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import HostelCanvasWrapper from '@/components/canvas/HostelCanvasWrapper';
 import { useApp } from '@/context/AppContext';
-import { getCurrentMealStatus } from '@/lib/utils';
-import { MealType } from '@/types';
-import ComplaintModal from '@/components/modals/ComplaintModal';
-import FoodRatingModal from '@/components/modals/FoodRatingModal';
 import { 
   Building2, 
   Sparkles, 
@@ -16,408 +12,477 @@ import {
   Activity, 
   ShieldCheck, 
   Wifi, 
-  Bot, 
-  Gamepad2, 
   ArrowRight, 
-  CheckCircle, 
+  Compass,
   Users, 
-  Layers, 
   Heart,
   ChevronRight,
   Clock,
-  Radio
+  Radio,
+  DoorOpen,
+  Camera,
+  Coffee,
+  Sun,
+  Moon,
+  ExternalLink
 } from 'lucide-react';
-import HostelMemoryGame from '@/components/game/HostelMemoryGame';
+import ComplaintModal from '@/components/modals/ComplaintModal';
+import FoodRatingModal from '@/components/modals/FoodRatingModal';
+import { sound } from '@/lib/sound';
 
 export default function HomePage() {
-  const { healthScores, complaints, currentUser } = useApp();
-  const [mealStatus, setMealStatus] = useState<{ current: MealType; status: 'active' | 'upcoming'; nextTime: string }>({
-    current: 'Lunch',
-    status: 'active',
-    nextTime: 'Ends at 2:00 PM',
-  });
-
-  useEffect(() => {
-    setMealStatus(getCurrentMealStatus());
-  }, []);
-
+  const { complaints, currentUser } = useApp();
   const [isComplaintOpen, setIsComplaintOpen] = useState(false);
   const [isFoodRatingOpen, setIsFoodRatingOpen] = useState(false);
 
   const activeComplaintsCount = complaints.filter((c) => c.status !== 'Resolved').length;
 
   return (
-    <div className="mx-auto max-w-7xl space-y-16 py-4">
+    <div className="space-y-28 pb-20">
       
-      {/* Hero Section */}
-      <section className="relative space-y-6 pt-4 text-center">
-        
-        {/* Spatial Badge */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold text-blue-300 shadow-lg backdrop-blur-xl animate-in fade-in duration-300">
-          <Sparkles className="h-3.5 w-3.5 text-blue-400" />
-          <span>Next-Generation Living Ecosystem</span>
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-        </div>
-
-        {/* Cinematic Headline */}
-        <div className="space-y-3">
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white">
-            <span className="bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-              COZY DEN
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent text-3xl sm:text-5xl lg:text-6xl font-extrabold">
-              Real 3D Multi-Layer Hostel Platform
-            </span>
-          </h1>
-          <p className="mx-auto max-w-2xl text-sm sm:text-base text-slate-300 leading-relaxed font-light">
-            A real digital experience fusing Apple Vision Pro spatial elegance, smart building metrics,
-            live meal schedules, rapid 48-hour escalation, and nostalgic hostel soul.
-          </p>
-        </div>
-
-        {/* CTA Button Group */}
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <Link
-            href="/student"
-            className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 py-3.5 text-xs sm:text-sm font-bold text-white shadow-xl shadow-indigo-500/25 hover:scale-105 transition-all"
-          >
-            <span>Enter Student Dashboard</span>
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
-            href="/management"
-            className="flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-6 py-3.5 text-xs sm:text-sm font-semibold text-white shadow-lg backdrop-blur-md hover:bg-white/10 hover:border-white/25 transition-all"
-          >
-            <Activity className="h-4 w-4 text-emerald-400" />
-            <span>Management Control Room</span>
-          </Link>
-          <Link
-            href="/picbot"
-            className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 px-5 py-3.5 text-xs sm:text-sm font-bold text-white shadow-xl shadow-purple-500/25 hover:scale-105 transition-all"
-          >
-            <Sparkles className="h-4 w-4" />
-            <span>DreamCast PicBot AI</span>
-          </Link>
-          <button
-            onClick={() => setIsComplaintOpen(true)}
-            className="flex items-center gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-5 py-3.5 text-xs sm:text-sm font-semibold text-amber-300 hover:bg-amber-500/20 transition-all"
-          >
-            <AlertTriangle className="h-4 w-4 text-amber-400" />
-            <span>Report Grievance</span>
-          </button>
-        </div>
-
-        {/* Real-time Hostel Pulse Ticker */}
-        <div className="mx-auto max-w-4xl grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4">
+      {/* =========================================================================
+          HERO SECTION: 3D DIGITAL TWIN AS THE CENTRAL ARRIVAL EXPERIENCE
+         ========================================================================= */}
+      <section className="relative px-4 sm:px-6 pt-6">
+        <div className="mx-auto max-w-7xl space-y-6">
           
-          <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5 backdrop-blur-xl text-left shadow-lg">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-              <span>Health Score</span>
-              <Activity className="h-3.5 w-3.5 text-emerald-400" />
+          {/* Top Architectural Overhead Title */}
+          <div className="text-center space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/25 bg-amber-500/10 px-4 py-1 text-xs font-semibold text-amber-300 backdrop-blur-xl">
+              <Compass className="h-3.5 w-3.5 text-amber-400" />
+              <span>COZY DEN SMART RESIDENCE • SECTOR 4</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
             </div>
-            <div className="text-xl font-black text-white">{healthScores.overall}/100</div>
-            <p className="text-[10px] text-emerald-400 flex items-center gap-1 mt-0.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              <span>Optimal Building Vitals</span>
+
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white">
+              <span className="bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+                Enter Your Hostel
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-amber-400 via-amber-200 to-orange-300 bg-clip-text text-transparent">
+                Digitally.
+              </span>
+            </h1>
+
+            <p className="mx-auto max-w-2xl text-sm sm:text-base text-slate-300 font-light leading-relaxed">
+              Step directly into COZY DEN through our interactive 3D digital twin. 
+              Click on the building zones below to enter the dining hall, check active announcements, 
+              or visit the rooftop memory lounge.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5 backdrop-blur-xl text-left shadow-lg">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-              <span>Next Meal</span>
-              <UtensilsCrossed className="h-3.5 w-3.5 text-amber-400" />
-            </div>
-            <div className="text-xl font-black text-white">{mealStatus.current}</div>
-            <p className="text-[10px] text-amber-400 flex items-center gap-1 mt-0.5">
-              <Clock className="h-3 w-3" />
-              <span>{mealStatus.nextTime}</span>
-            </p>
+          {/* Realistic 3D Central Building Viewport */}
+          <div className="relative rounded-3xl overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.8)] border border-white/[0.08]">
+            <HostelCanvasWrapper />
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5 backdrop-blur-xl text-left shadow-lg">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-              <span>WiFi Network</span>
-              <Wifi className="h-3.5 w-3.5 text-cyan-400" />
+          {/* Interactive Zone Doorway Ribbon */}
+          <div className="pt-2">
+            <div className="vision-pill p-2 sm:p-3 rounded-2xl sm:rounded-full flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-xs font-medium">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400/90 px-2 shrink-0">
+                Clickable Areas:
+              </span>
+
+              <Link
+                href="/announcements"
+                onClick={() => sound.playClick()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] hover:bg-amber-500/20 text-slate-200 hover:text-amber-300 border border-white/[0.06] hover:border-amber-500/40 transition-all"
+              >
+                <DoorOpen className="h-3.5 w-3.5 text-amber-400" />
+                <span>Entrance ➔ Announcements</span>
+              </Link>
+
+              <Link
+                href="/food"
+                onClick={() => sound.playClick()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] hover:bg-amber-500/20 text-slate-200 hover:text-amber-300 border border-white/[0.06] hover:border-amber-500/40 transition-all"
+              >
+                <UtensilsCrossed className="h-3.5 w-3.5 text-amber-400" />
+                <span>Mess ➔ Food Reviews</span>
+              </Link>
+
+              <Link
+                href="/student"
+                onClick={() => sound.playClick()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] hover:bg-blue-500/20 text-slate-200 hover:text-blue-300 border border-white/[0.06] hover:border-blue-500/40 transition-all"
+              >
+                <Building2 className="h-3.5 w-3.5 text-blue-400" />
+                <span>Rooms ➔ Student Portal</span>
+              </Link>
+
+              <Link
+                href="/management"
+                onClick={() => sound.playClick()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] hover:bg-purple-500/20 text-slate-200 hover:text-purple-300 border border-white/[0.06] hover:border-purple-500/40 transition-all"
+              >
+                <Activity className="h-3.5 w-3.5 text-purple-400" />
+                <span>Office ➔ Management</span>
+              </Link>
+
+              <Link
+                href="/memories"
+                onClick={() => sound.playClick()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] hover:bg-pink-500/20 text-slate-200 hover:text-pink-300 border border-white/[0.06] hover:border-pink-500/40 transition-all"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-pink-400" />
+                <span>Rooftop ➔ DreamCast Memories</span>
+              </Link>
             </div>
-            <div className="text-xl font-black text-white">{healthScores.wifi}%</div>
-            <p className="text-[10px] text-cyan-400 flex items-center gap-1 mt-0.5">
-              <Radio className="h-3 w-3" />
-              <span>1 Gbps Optical Mesh</span>
-            </p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5 backdrop-blur-xl text-left shadow-lg">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-              <span>Active Issues</span>
-              <AlertTriangle className="h-3.5 w-3.5 text-rose-400" />
+          {/* Real-time Atmosphere Strip */}
+          <div className="flex flex-wrap items-center justify-between gap-4 py-3 px-6 rounded-2xl bg-white/[0.02] border border-white/[0.04] text-xs text-slate-400 font-light">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-slate-300 font-medium">Campus Status: Serene &amp; Operational</span>
             </div>
-            <div className="text-xl font-black text-white">{activeComplaintsCount}</div>
-            <p className="text-[10px] text-rose-400 flex items-center gap-1 mt-0.5">
-              <span>48h Escalation Active</span>
-            </p>
+            <div className="flex items-center gap-6">
+              <span>284 Residents Home</span>
+              <span>•</span>
+              <span>1 Gbps Optical Mesh Active</span>
+              <span>•</span>
+              <span className="text-amber-400">Mess: Preparing Dinner (8:00 PM)</span>
+            </div>
           </div>
 
         </div>
-
       </section>
 
-      {/* 3D INTERACTIVE HOSTEL ENVIRONMENT */}
-      <section className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-blue-400">
-                Spatial 3D Architecture
+
+      {/* =========================================================================
+          STORYTELLING CHAPTER I: ARCHITECTURAL ATMOSPHERE
+         ========================================================================= */}
+      <section className="px-4 sm:px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="vision-glass-warm rounded-3xl p-8 sm:p-14 space-y-8 relative overflow-hidden">
+            <div className="max-w-2xl space-y-4">
+              <span className="text-xs font-mono uppercase tracking-widest text-amber-400">
+                Chapter I • The Sanctuary
               </span>
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+              <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+                Built for Deep Focus by Day.<br />
+                Vibrant Community by Night.
+              </h2>
+              <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed">
+                COZY DEN was designed from the ground up to replace cold institutional dormitories with 
+                an emotionally resonant home. With natural cross-ventilation, chocolate brown balcony alcoves, 
+                dedicated 24/7 quiet study pods, and warm evening lighting, every corner is crafted to dignify 
+                your university years.
+              </p>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-white">
-              The Living 3D Hostel Twin
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-white/[0.08]">
+              <div className="space-y-2">
+                <div className="text-amber-400 font-bold text-lg font-mono">01. Optical Mesh</div>
+                <h3 className="text-white font-semibold text-sm">Gigabit WiFi in Every Pod</h3>
+                <p className="text-xs text-slate-400 font-light leading-relaxed">
+                  Enterprise access points deployed across all corridors with zero packet latency from 
+                  your desk to the rooftop terrace.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="text-amber-400 font-bold text-lg font-mono">02. Restful Hours</div>
+                <h3 className="text-white font-semibold text-sm">Strict 10 PM Quiet Protocol</h3>
+                <p className="text-xs text-slate-400 font-light leading-relaxed">
+                  Automatic noise dampening and peaceful corridor rules so every student can sleep, 
+                  recharge, or study undisturbed.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="text-amber-400 font-bold text-lg font-mono">03. Warm Lighting</div>
+                <h3 className="text-white font-semibold text-sm">Comfort-Tuned Kelvin Scale</h3>
+                <p className="text-xs text-slate-400 font-light leading-relaxed">
+                  Soothing evening tungsten and amber lanterns that reduce screen fatigue and invite 
+                  genuine late-night conversations.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* =========================================================================
+          STORYTELLING CHAPTER II: THE DAILY RHYTHM
+         ========================================================================= */}
+      <section className="px-4 sm:px-6">
+        <div className="mx-auto max-w-7xl space-y-10">
+          <div className="text-center max-w-xl mx-auto space-y-2">
+            <span className="text-xs font-mono uppercase tracking-widest text-amber-400">
+              Chapter II • The Pulse
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-white">
+              The Daily Rhythm of COZY DEN
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400">
-              Inspect all 5 architectural floors. Switch from Twilight to Day mode, explode floor layers, or click markers to explore.
+            <p className="text-xs sm:text-sm text-slate-400 font-light">
+              How our community moves, feeds, creates, and unwinds through the hours.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            
+            {/* Morning */}
+            <div className="vision-glass rounded-3xl p-6 space-y-4 hover:border-amber-400/30 transition-all">
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span className="font-mono text-amber-400 font-bold">09:00 AM</span>
+                <Sun className="h-4 w-4 text-amber-400" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Sunrise Feast</h3>
+              <p className="text-xs text-slate-300 font-light leading-relaxed">
+                Crispy ghee roast masala dosa, fluffy idlis, boiled eggs, fresh fruits, and hot filter coffee 
+                at the Ground Mess Hall.
+              </p>
+              <div className="text-[11px] text-amber-400/90 font-medium pt-2 border-t border-white/[0.06]">
+                Chef Special: Ghee Roast Dosa
+              </div>
+            </div>
+
+            {/* Midday */}
+            <div className="vision-glass rounded-3xl p-6 space-y-4 hover:border-amber-400/30 transition-all">
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span className="font-mono text-blue-400 font-bold">01:00 PM</span>
+                <Clock className="h-4 w-4 text-blue-400" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Grand Lunch Dining</h3>
+              <p className="text-xs text-slate-300 font-light leading-relaxed">
+                Shahi paneer, dal makhani, fragrant jeera rice, butter naan, cucumber raita, and sweet gulab jamun.
+              </p>
+              <div className="text-[11px] text-blue-400/90 font-medium pt-2 border-t border-white/[0.06]">
+                Capacity: 120 Residents
+              </div>
+            </div>
+
+            {/* Sunset */}
+            <div className="vision-glass rounded-3xl p-6 space-y-4 hover:border-amber-400/30 transition-all">
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span className="font-mono text-orange-400 font-bold">06:00 PM</span>
+                <Coffee className="h-4 w-4 text-orange-400" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Sunset High Tea</h3>
+              <p className="text-xs text-slate-300 font-light leading-relaxed">
+                Hot samosas with mint chutney, vegetable pakoras, and freshly brewed cardamom ginger chai in the courtyard.
+              </p>
+              <div className="text-[11px] text-orange-400/90 font-medium pt-2 border-t border-white/[0.06]">
+                Courtyard Acoustic Hour
+              </div>
+            </div>
+
+            {/* Night */}
+            <div className="vision-glass rounded-3xl p-6 space-y-4 hover:border-amber-400/30 transition-all">
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span className="font-mono text-purple-400 font-bold">08:00 PM</span>
+                <Moon className="h-4 w-4 text-purple-400" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Warm Dinner &amp; Terrace</h3>
+              <p className="text-xs text-slate-300 font-light leading-relaxed">
+                Smoky kadai vegetables, yellow tadka dal, phulkas, followed by stargazing and music on the DreamCast Sky Terrace.
+              </p>
+              <div className="text-[11px] text-purple-400/90 font-medium pt-2 border-t border-white/[0.06]">
+                Sky Lounge Stargazing
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+
+      {/* =========================================================================
+          STORYTELLING CHAPTER III: THE 48-HOUR RESOLUTION GUARANTEE
+         ========================================================================= */}
+      <section className="px-4 sm:px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="vision-glass rounded-3xl p-8 sm:p-14 border border-rose-500/20 space-y-6 relative overflow-hidden">
+            <div className="max-w-2xl space-y-3">
+              <span className="text-xs font-mono uppercase tracking-widest text-rose-400">
+                Chapter III • Care &amp; Dignity
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+                Every Issue Resolved in 48 Hours.<br />
+                Or Management Gets a RED ALERT.
+              </h2>
+              <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed">
+                A leaking tap, flickering study lamp, or slow WiFi connection isn&apos;t just an IT ticket — 
+                it is your daily peace of mind. We hold ourselves strictly accountable: if any unresolved grievance 
+                exceeds 48 hours, our autonomous background worker dispatches an immediate critical alert 
+                directly to Head Warden Dr. Anita Desai and faculty leadership.
+              </p>
+            </div>
+
+            <div className="pt-4 flex flex-wrap items-center gap-4">
+              <Link
+                href="/complaints"
+                onClick={() => sound.playClick()}
+                className="flex items-center gap-2 rounded-full bg-rose-600 hover:bg-rose-500 px-6 py-3 text-xs font-bold text-white shadow-xl shadow-rose-600/25 transition-all"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                <span>Open Grievance Radar</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setIsComplaintOpen(true);
+                }}
+                className="flex items-center gap-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] px-5 py-3 text-xs font-semibold text-slate-200 transition-all"
+              >
+                <span>Report an Issue Now</span>
+              </button>
+
+              <span className="text-xs text-slate-400 font-light pl-2">
+                Anonymous reporting strictly supported.
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* =========================================================================
+          STORYTELLING CHAPTER IV: DREAMCAST MEMORY LOUNGE
+         ========================================================================= */}
+      <section className="px-4 sm:px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="vision-glass rounded-3xl p-8 sm:p-12 space-y-8 relative overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div className="space-y-2 max-w-2xl">
+                <span className="text-xs font-mono uppercase tracking-widest text-pink-400">
+                  Chapter IV • Soul &amp; Brotherhood
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-black text-white">
+                  DreamCast PicBot AI Lounge
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-300 font-light leading-relaxed">
+                  Hostel years fly by in an instant. DreamCast indexes community moments from rooftop jam sessions, 
+                  festivals, and late-night mess laughter. Search any memory instantly using AI face recognition, 
+                  with guaranteed resident biometric consent and strict privacy safeguards.
+                </p>
+              </div>
+
+              <Link
+                href="/memories"
+                onClick={() => sound.playClick()}
+                className="flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 px-6 py-3 text-xs font-bold text-white shadow-xl shadow-pink-600/25 hover:opacity-90 transition-all shrink-0"
+              >
+                <Camera className="h-4 w-4" />
+                <span>Explore Memory Lounge</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* =========================================================================
+          CHAPTER V: DIGITAL SANCTUARY DOORWAYS (ENTER YOUR SPACE)
+         ========================================================================= */}
+      <section className="px-4 sm:px-6">
+        <div className="mx-auto max-w-7xl space-y-8">
+          <div className="text-center max-w-lg mx-auto space-y-2">
+            <span className="text-xs font-mono uppercase tracking-widest text-amber-400">
+              Chapter V • Doorways
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-white">
+              Step Into Your Space
+            </h2>
+            <p className="text-xs text-slate-400 font-light">
+              Choose your sanctuary to access tailored services, schedules, and tools.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <Link
+              href="/student"
+              onClick={() => sound.playClick()}
+              className="vision-glass p-6 rounded-3xl space-y-4 hover:border-blue-400/40 group transition-all"
+            >
+              <div className="h-10 w-10 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                <Building2 className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors">
+                My Hostel Suite
+              </h3>
+              <p className="text-xs text-slate-400 font-light leading-relaxed">
+                Your personal resident room dashboard, digital pass, active quiet hours, and personal issue history.
+              </p>
+              <div className="flex items-center gap-1.5 text-xs text-blue-400 font-semibold pt-2">
+                <span>Enter Room</span>
+                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
             <Link
               href="/food"
-              className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+              onClick={() => sound.playClick()}
+              className="vision-glass p-6 rounded-3xl space-y-4 hover:border-amber-400/40 group transition-all"
             >
-              Today&apos;s Mess Menu →
+              <div className="h-10 w-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                <UtensilsCrossed className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white group-hover:text-amber-300 transition-colors">
+                The Dining Hall
+              </h3>
+              <p className="text-xs text-slate-400 font-light leading-relaxed">
+                Today&apos;s 4-meal live menu, nutrition insights, chef specials, and verified student culinary reviews.
+              </p>
+              <div className="flex items-center gap-1.5 text-xs text-amber-400 font-semibold pt-2">
+                <span>Check Daily Menu</span>
+                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
             </Link>
-          </div>
-        </div>
 
-        {/* 3D Canvas Box */}
-        <HostelCanvasWrapper />
-      </section>
-
-      {/* CORE MODULES (Apple Vision Pro Glass Grid) */}
-      <section className="space-y-6">
-        <div className="text-center space-y-2">
-          <span className="text-xs font-bold uppercase tracking-widest text-purple-400">
-            Engineered Capabilities
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-black text-white">
-            Everything A Real Hostel Demands
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-            From smart 48-hour grievance alerts to four-pillar food ratings and AI support.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          
-          {/* Card 1: Student Dashboard */}
-          <Link
-            href="/student"
-            className="group relative rounded-3xl border border-white/10 bg-slate-900/50 p-6 backdrop-blur-xl shadow-xl hover:border-blue-500/40 hover:bg-slate-900/80 transition-all"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-4 group-hover:scale-110 transition-transform">
-              <Users className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors flex items-center justify-between">
-              <span>Student Dashboard</span>
-              <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
-            </h3>
-            <p className="mt-2 text-xs text-slate-400 leading-relaxed">
-              Live meal schedule (Breakfast, Lunch, High Tea, Dinner), one-click food reviews, room details, and personal complaint radar.
-            </p>
-            <div className="mt-4 flex items-center gap-2 text-[11px] text-blue-400 font-medium">
-              <span>Enter Resident Suite</span>
-              <span>→</span>
-            </div>
-          </Link>
-
-          {/* Card 2: Management Control */}
-          <Link
-            href="/management"
-            className="group relative rounded-3xl border border-white/10 bg-slate-900/50 p-6 backdrop-blur-xl shadow-xl hover:border-emerald-500/40 hover:bg-slate-900/80 transition-all"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-4 group-hover:scale-110 transition-transform">
-              <Activity className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors flex items-center justify-between">
-              <span>Management Control</span>
-              <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
-            </h3>
-            <p className="mt-2 text-xs text-slate-400 leading-relaxed">
-              Live building vitals (Food, WiFi, Water, Electricity, Cleanliness). Assign staff, resolve issues, and monitor health scores.
-            </p>
-            <div className="mt-4 flex items-center gap-2 text-[11px] text-emerald-400 font-medium">
-              <span>Open Control Room</span>
-              <span>→</span>
-            </div>
-          </Link>
-
-          {/* Card 3: Smart Escalation System */}
-          <Link
-            href="/complaints"
-            className="group relative rounded-3xl border border-white/10 bg-slate-900/50 p-6 backdrop-blur-xl shadow-xl hover:border-rose-500/40 hover:bg-slate-900/80 transition-all"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-400 border border-rose-500/20 mb-4 group-hover:scale-110 transition-transform">
-              <AlertTriangle className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white group-hover:text-rose-300 transition-colors flex items-center justify-between">
-              <span>48h Smart Escalation</span>
-              <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-rose-400 group-hover:translate-x-1 transition-all" />
-            </h3>
-            <p className="mt-2 text-xs text-slate-400 leading-relaxed">
-              Zero ignored grievances. Unresolved issues after 48h instantly trigger broadcast Red Alerts to Management, Teachers & Student Reps.
-            </p>
-            <div className="mt-4 flex items-center gap-2 text-[11px] text-rose-400 font-medium">
-              <span>Test Escalation Radar</span>
-              <span>→</span>
-            </div>
-          </Link>
-
-          {/* Card 4: Four-Pillar Food Ratings */}
-          <Link
-            href="/food"
-            className="group relative rounded-3xl border border-white/10 bg-slate-900/50 p-6 backdrop-blur-xl shadow-xl hover:border-amber-500/40 hover:bg-slate-900/80 transition-all"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-4 group-hover:scale-110 transition-transform">
-              <UtensilsCrossed className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white group-hover:text-amber-300 transition-colors flex items-center justify-between">
-              <span>Mess Food Rating System</span>
-              <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
-            </h3>
-            <p className="mt-2 text-xs text-slate-400 leading-relaxed">
-              Rate Taste, Quality, Hygiene, and Quantity with real 5-star precision. Real-time feedback pushes accountability to the kitchen.
-            </p>
-            <div className="mt-4 flex items-center gap-2 text-[11px] text-amber-400 font-medium">
-              <span>Explore Weekly Menu</span>
-              <span>→</span>
-            </div>
-          </Link>
-
-          {/* Card 5: Cozy Assistant AI */}
-          <Link
-            href="/ai-assistant"
-            className="group relative rounded-3xl border border-white/10 bg-slate-900/50 p-6 backdrop-blur-xl shadow-xl hover:border-purple-500/40 hover:bg-slate-900/80 transition-all"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20 mb-4 group-hover:scale-110 transition-transform">
-              <Bot className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white group-hover:text-purple-300 transition-colors flex items-center justify-between">
-              <span>Cozy Assistant (AI)</span>
-              <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
-            </h3>
-            <p className="mt-2 text-xs text-slate-400 leading-relaxed">
-              Ask about curfew timings, mess specials, lodge anonymous complaints, or get emergency medical assistance with intelligent synthesis.
-            </p>
-            <div className="mt-4 flex items-center gap-2 text-[11px] text-purple-400 font-medium">
-              <span>Start AI Dialogue</span>
-              <span>→</span>
-            </div>
-          </Link>
-
-          {/* Card 6: Retro Memory Game */}
-          <Link
-            href="/game"
-            className="group relative rounded-3xl border border-white/10 bg-slate-900/50 p-6 backdrop-blur-xl shadow-xl hover:border-cyan-500/40 hover:bg-slate-900/80 transition-all"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 mb-4 group-hover:scale-110 transition-transform">
-              <Gamepad2 className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white group-hover:text-cyan-300 transition-colors flex items-center justify-between">
-              <span>Hostel Memory Game</span>
-              <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
-            </h3>
-            <p className="mt-2 text-xs text-slate-400 leading-relaxed">
-              Relive late-night corridor runs in nostalgic 8-bit retro arcade style. Dodge the warden&apos;s flashlight & collect Chai and Maggi!
-            </p>
-            <div className="mt-4 flex items-center gap-2 text-[11px] text-cyan-400 font-medium">
-              <span>Play 8-Bit Arcade</span>
-              <span>→</span>
-            </div>
-          </Link>
-
-          {/* Card 7: DreamCast PicBot (AI Personal Memory Finder) */}
-          <Link
-            href="/picbot"
-            className="group relative rounded-3xl border border-white/10 bg-slate-900/50 p-6 backdrop-blur-xl shadow-xl hover:border-purple-500/40 hover:bg-slate-900/80 transition-all sm:col-span-2 lg:col-span-3"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/20 mb-2 sm:mb-0 group-hover:scale-110 transition-transform">
-                  <Sparkles className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[9px] font-bold text-purple-300 uppercase tracking-wider border border-purple-500/30">
-                      Module 8 • AI Vision Agent
-                    </span>
-                    <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-bold text-emerald-300">
-                      512-Dim pgvector
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors mt-1 flex items-center gap-2">
-                    <span>COZY DEN DreamCast PicBot</span>
-                    <span className="text-xs font-normal text-slate-400 italic">
-                      — &ldquo;Give me your photo, I&apos;ll find your memories.&rdquo;
-                    </span>
-                  </h3>
-                  <p className="mt-1 text-xs text-slate-400 leading-relaxed max-w-2xl">
-                    Students never manually search thousands of hostel event photos again. Upload one reference selfie, and our AI locates every frame of cricket matches, rooftop jams, and celebrations where you appear.
-                  </p>
-                </div>
-              </div>
-
-              <div className="shrink-0 flex items-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-all">
-                <span>Launch PicBot AI</span>
-                <ChevronRight className="h-4 w-4" />
-              </div>
-            </div>
-          </Link>
-
-        </div>
-      </section>
-
-      {/* QUICK ACTIONS & INTERACTIVE TEST DRIVE */}
-      <section className="rounded-3xl border border-white/10 bg-gradient-to-r from-blue-950/40 via-indigo-950/30 to-purple-950/40 p-8 backdrop-blur-2xl shadow-2xl">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 max-w-xl">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
-              Interactive Resident Experience
-            </span>
-            <h3 className="text-2xl font-black text-white">
-              Try Logging An Issue Or Rating Today&apos;s Lunch
-            </h3>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Experience the instant reactive state in action. Test complaint submissions with photo evidence,
-              submit anonymous grievances, or rate the four pillars of hostel dining.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => setIsComplaintOpen(true)}
-              className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-xs font-bold text-white shadow-lg shadow-blue-500/25 hover:from-blue-500 hover:to-indigo-500 transition-all flex items-center gap-2"
+            <Link
+              href="/complaints"
+              onClick={() => sound.playClick()}
+              className="vision-glass p-6 rounded-3xl space-y-4 hover:border-rose-400/40 group transition-all"
             >
-              <AlertTriangle className="h-4 w-4" />
-              <span>Report Grievance</span>
-            </button>
-            <button
-              onClick={() => setIsFoodRatingOpen(true)}
-              className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-6 py-3 text-xs font-bold text-amber-300 hover:bg-amber-500/20 transition-all flex items-center gap-2"
+              <div className="h-10 w-10 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 group-hover:scale-110 transition-transform">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white group-hover:text-rose-300 transition-colors">
+                Grievance Radar
+              </h3>
+              <p className="text-xs text-slate-400 font-light leading-relaxed">
+                Report WiFi, plumbing, or room issues with photo attachments and 48-hour automated escalation.
+              </p>
+              <div className="flex items-center gap-1.5 text-xs text-rose-400 font-semibold pt-2">
+                <span>File Grievance</span>
+                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            <Link
+              href="/management"
+              onClick={() => sound.playClick()}
+              className="vision-glass p-6 rounded-3xl space-y-4 hover:border-purple-400/40 group transition-all"
             >
-              <UtensilsCrossed className="h-4 w-4" />
-              <span>Rate Today&apos;s Meal</span>
-            </button>
+              <div className="h-10 w-10 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+                <Activity className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">
+                Warden Operations
+              </h3>
+              <p className="text-xs text-slate-400 font-light leading-relaxed">
+                Management control room with IoT environmental sensors, red alerts, and full floor status.
+              </p>
+              <div className="flex items-center gap-1.5 text-xs text-purple-400 font-semibold pt-2">
+                <span>Access Console</span>
+                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
           </div>
         </div>
       </section>
 
-      {/* RETRO NOSTALGIC GAME EMBEDDED AT BOTTOM */}
-      <section className="space-y-4 pt-4">
-        <HostelMemoryGame />
-      </section>
-
-      {/* Modals */}
+      {/* Global Modals */}
       <ComplaintModal isOpen={isComplaintOpen} onClose={() => setIsComplaintOpen(false)} />
-      <FoodRatingModal isOpen={isFoodRatingOpen} onClose={() => setIsFoodRatingOpen(false)} />
+      <FoodRatingModal isOpen={isFoodRatingOpen} onClose={() => setIsFoodRatingOpen(false)} defaultMeal="Dinner" />
 
     </div>
   );
