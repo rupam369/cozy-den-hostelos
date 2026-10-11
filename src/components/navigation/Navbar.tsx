@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import { 
   Building2, 
@@ -19,12 +19,15 @@ import {
   X,
   Sparkles,
   ExternalLink,
-  Camera
+  Camera,
+  LogOut
 } from 'lucide-react';
 import { UserRole, HostelPosition } from '@/types';
+import { supabaseService } from '@/lib/supabaseService';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { currentUser, switchRole, notifications, markAsRead, markAllAsRead } = useApp();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
@@ -255,7 +258,7 @@ export default function Navbar() {
                       </button>
                     </div>
                   ))}
-                  <div className="border-t border-white/10 pt-1.5 mt-1">
+                  <div className="border-t border-white/10 pt-1.5 mt-1 space-y-1">
                     <Link
                       href="/profile"
                       onClick={() => setIsRoleMenuOpen(false)}
@@ -263,6 +266,18 @@ export default function Navbar() {
                     >
                       Edit Profile & Position →
                     </Link>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setIsRoleMenuOpen(false);
+                        await supabaseService.signOut();
+                        router.push('/login');
+                      }}
+                      className="w-full flex items-center justify-center gap-1.5 rounded-xl px-3 py-1.5 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-center"
+                    >
+                      <LogOut className="h-3 w-3" />
+                      <span>Log Out</span>
+                    </button>
                   </div>
                 </div>
               )}

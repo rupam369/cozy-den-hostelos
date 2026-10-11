@@ -23,9 +23,9 @@ import { supabaseService } from '@/lib/supabaseService';
 import { sound } from '@/lib/sound';
 
 const POSITIONS_BY_ROLE: Record<UserRole, HostelPosition[]> = {
-  student: ['Room leader', 'Floor representative', 'Resident'],
-  teacher: ['Faculty Advisor', 'Warden'],
-  management: ['Warden', 'Mess manager', 'Admin'],
+  student: ['Room Leader', 'Floor Representative', 'Resident'],
+  teacher: ['Warden', 'Faculty', 'Faculty Advisor'],
+  management: ['Admin', 'Mess Manager', 'Maintenance Head'],
 };
 
 export default function LoginPage() {
@@ -47,7 +47,7 @@ export default function LoginPage() {
   const [fullName, setFullName] = useState('');
   const [age, setAge] = useState<number>(20);
   const [selectedRole, setSelectedRole] = useState<UserRole>('student');
-  const [selectedPosition, setSelectedPosition] = useState<HostelPosition>('Room leader');
+  const [selectedPosition, setSelectedPosition] = useState<HostelPosition>('Room Leader');
   const [roomNumber, setRoomNumber] = useState('Room 304');
   const [floor, setFloor] = useState<number>(3);
   const [wing, setWing] = useState('A');
@@ -111,18 +111,44 @@ export default function LoginPage() {
     sound.playClick();
     setIsLoading(true);
 
+    let authedUser: UserProfile | null = null;
+
     if (authMethod === 'email') {
-      await supabaseService.signInWithEmail(email, password);
+      const { data, error } = await supabaseService.signInWithEmail(email, password);
+      if (error) {
+        console.warn('Supabase auth notice:', error.message);
+      } else if (data?.user) {
+        const { data: dbProfile } = await supabaseService.fetchProfile(data.user.id);
+        if (dbProfile) {
+          authedUser = {
+            id: dbProfile.id,
+            email: dbProfile.email || email,
+            phone: dbProfile.phone || phone,
+            full_name: dbProfile.full_name || dbProfile.name || fullName,
+            name: dbProfile.name || dbProfile.full_name || fullName,
+            age: dbProfile.age || 21,
+            role: (dbProfile.role as UserRole) || selectedRole,
+            position: (dbProfile.hostel_position as HostelPosition) || selectedPosition,
+            hostel_position: (dbProfile.hostel_position as HostelPosition) || selectedPosition,
+            room_number: dbProfile.room_number || roomNumber,
+            floor: dbProfile.floor || floor,
+            wing: dbProfile.wing || wing,
+            avatar_url: dbProfile.avatar_url || avatarUrl,
+          };
+        }
+      }
     }
 
-    const user: UserProfile = {
+    const user: UserProfile = authedUser || {
       id: `usr-${Date.now().toString().slice(-4)}`,
       email: email || 'resident@cozyden.edu',
       phone: phone || '+91 98765 43210',
       full_name: fullName || 'Aryan Sharma',
+      name: fullName || 'Aryan Sharma',
       age: 21,
       role: selectedRole,
       position: selectedPosition,
+      hostel_position: selectedPosition,
       room_number: roomNumber,
       floor,
       wing,
@@ -146,25 +172,45 @@ export default function LoginPage() {
 
     const generatedEmail = email || `${fullName.toLowerCase().replace(/\s+/g, '.')}@cozyden.edu`;
 
+    let assignedId = `usr-${Date.now().toString().slice(-4)}`;
+
+    if (email && password) {
+      const { data, error } = await supabaseService.signUpWithEmail(email, password, {
+        name: fullName,
+        age: Number(age),
+        role: selectedRole,
+        hostel_position: selectedPosition,
+        phone,
+        profile_image: avatarUrl,
+        room_number: roomNumber,
+        floor: Number(floor),
+        wing,
+      });
+
+      if (error) {
+        console.warn('Supabase registration notice:', error.message);
+      } else if (data?.user) {
+        assignedId = data.user.id;
+      }
+    }
+
     const newUser: UserProfile = {
-      id: `usr-${Date.now().toString().slice(-4)}`,
+      id: assignedId,
       email: generatedEmail,
       phone,
       full_name: fullName,
+      name: fullName,
       age: Number(age),
       role: selectedRole,
       position: selectedPosition,
+      hostel_position: selectedPosition,
       room_number: roomNumber,
       floor: Number(floor),
       wing,
       avatar_url: avatarUrl,
     };
 
-    if (email && password) {
-      await supabaseService.signUpWithEmail(email, password, newUser);
-    }
     await supabaseService.upsertProfile(newUser);
-
     setCurrentUser(newUser);
     setIsLoading(false);
     sound.playChime();
@@ -536,13 +582,9 @@ export default function LoginPage() {
                     onChange={(e) => setSelectedPosition(e.target.value as HostelPosition)}
                     className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-xs text-white focus:border-blue-500 focus:outline-none"
                   >
-                    <option value="Room leader">Room leader</option>
-                    <option value="Floor representative">Floor representative</option>
-                    <option value="Warden">Warden</option>
-                    <option value="Mess manager">Mess manager</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Resident">Resident</option>
-                    <option value="Faculty Advisor">Faculty Advisor</option>
+                    {POSITIONS_BY_ROLE[selectedRole].map((pos) => (
+                      <option key={pos} value={pos}>{pos}</option>
+                    ))}
                   </select>
                 </div>
 

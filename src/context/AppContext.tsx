@@ -21,6 +21,7 @@ import {
 } from '@/types';
 import { INITIAL_PICBOT_MEMORIES } from '@/lib/picbotEngine';
 import { INITIAL_MEALS } from '@/lib/utils';
+import { supabaseService } from '@/lib/supabaseService';
 
 interface AppContextType {
   currentUser: UserProfile;
@@ -532,6 +533,124 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Live Supabase Sync & Realtime Subscriptions (TASK 1, TASK 6)
+  useEffect(() => {
+    if (!supabaseService.isLive()) return;
+
+    // Check existing auth session
+    supabaseService.getSession().then(({ data }) => {
+      if (data?.session?.user) {
+        supabaseService.fetchProfile(data.session.user.id).then(({ data: profile }) => {
+          if (profile) {
+            setCurrentUser((prev) => ({
+              ...prev,
+              id: profile.id,
+              full_name: profile.full_name || profile.name || prev.full_name,
+              name: profile.name || profile.full_name || prev.name,
+              email: profile.email || prev.email,
+              phone: profile.phone || prev.phone,
+              age: profile.age || prev.age,
+              role: profile.role || prev.role,
+              position: profile.position || profile.hostel_position || prev.position,
+              hostel_position: profile.hostel_position || profile.position || prev.hostel_position,
+              room_number: profile.room_number || prev.room_number,
+              floor: profile.floor || prev.floor,
+              wing: profile.wing || prev.wing,
+              avatar_url: profile.avatar_url || profile.profile_image || prev.avatar_url,
+              profile_image: profile.profile_image || profile.avatar_url || prev.profile_image,
+            }));
+          }
+        });
+      }
+    });
+
+    // Fetch initial live data
+    supabaseService.fetchComplaints().then(({ data }) => {
+      if (data && data.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setComplaints(data.map((c: any) => ({
+          ...c,
+          photo_url: c.image_url || c.photo_url,
+        })));
+      }
+    });
+    supabaseService.fetchFoodReviews().then(({ data }) => {
+      if (data && data.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setReviews(data.map((r: any) => ({
+          ...r,
+          comments: r.comment || r.comments || '',
+        })));
+      }
+    });
+    supabaseService.fetchAnnouncements().then(({ data }) => {
+      if (data && data.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setAnnouncements(data.map((a: any) => ({
+          ...a,
+          content: a.description || a.content || '',
+        })));
+      }
+    });
+    supabaseService.fetchNotifications().then(({ data }) => {
+      if (data && data.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setNotifications(data.map((n: any) => ({
+          ...n,
+          type: n.type === 'Complaint Alert' ? 'red' : n.type === 'Announcement' ? 'green' : 'yellow',
+        })));
+      }
+    });
+
+    // Realtime subscription 1: Complaints (Instant sync between students and management)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const unsubComplaints = supabaseService.subscribeToComplaints((payload: any) => {
+      if (payload?.eventType === 'INSERT' && payload?.new) {
+        const newComp = { ...payload.new, photo_url: payload.new.image_url || payload.new.photo_url };
+        setComplaints((prev) => {
+          if (prev.some((c) => c.id === newComp.id)) return prev;
+          return [newComp, ...prev];
+        });
+      } else if (payload?.eventType === 'UPDATE' && payload?.new) {
+        const updatedComp = { ...payload.new, photo_url: payload.new.image_url || payload.new.photo_url };
+        setComplaints((prev) =>
+          prev.map((c) => (c.id === updatedComp.id ? { ...c, ...updatedComp } : c))
+        );
+      }
+    });
+
+    // Realtime subscription 2: Notifications
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const unsubNotifications = supabaseService.subscribeToNotifications((payload: any) => {
+      if (payload?.eventType === 'INSERT' && payload?.new) {
+        const notif = payload.new;
+        const colorType = notif.type === 'Complaint Alert' ? 'red' : notif.type === 'Announcement' ? 'green' : 'yellow';
+        setNotifications((prev) => {
+          if (prev.some((n) => n.id === notif.id)) return prev;
+          return [{ ...notif, type: colorType }, ...prev];
+        });
+      }
+    });
+
+    // Realtime subscription 3: Announcements
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const unsubAnnouncements = supabaseService.subscribeToAnnouncements((payload: any) => {
+      if (payload?.eventType === 'INSERT' && payload?.new) {
+        const ann = payload.new;
+        setAnnouncements((prev) => {
+          if (prev.some((a) => a.id === ann.id)) return prev;
+          return [{ ...ann, content: ann.description || ann.content || '' }, ...prev];
+        });
+      }
+    });
+
+    return () => {
+      unsubComplaints();
+      unsubNotifications();
+      unsubAnnouncements();
+    };
+  }, []);
+
   // Save to local storage on changes
   useEffect(() => {
     try {
@@ -589,6 +708,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     setComplaints((prev) => [newComplaint, ...prev]);
+    supabaseService.insertComplaint({
+      ...data,
+      user_name: data.is_anonymous ? 'Anonymous Resident' : currentUser.full_name,
+      status: 'Pending',
+      is_escalated: false,
+      created_by: currentUser.id,
+    }).catch(console.error);
 
     // Dispatch Yellow notification
     addNotification({
@@ -606,6 +732,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setComplaints((prev) =>
       prev.map((c) => (c.id === id ? { ...c, status } : c))
     );
+    supabaseService.updateComplaintStatus(id, status).catch(console.error);
   };
 
   // Assign staff
@@ -617,6 +744,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           : c
       )
     );
+    supabaseService.assignComplaint(id, staffName).catch(console.error);
 
     const targetComp = complaints.find((c) => c.id === id);
     if (targetComp) {
@@ -646,6 +774,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           : c
       )
     );
+    supabaseService.updateComplaintStatus(id, 'Resolved', notes).catch(console.error);
 
     // Green notification
     addNotification({
@@ -672,6 +801,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           : c
       )
     );
+    supabaseService.updateComplaintStatus(id, 'Pending').catch(console.error);
 
     const comp = complaints.find((c) => c.id === id);
     const title = comp ? comp.title : 'Hostel Utility Outage';
@@ -707,6 +837,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     setReviews((prev) => [newRev, ...prev]);
+    supabaseService.insertFoodReview({
+      user_id: currentUser.id,
+      ...reviewData,
+    }).catch(console.error);
 
     // Send notification
     addNotification({
@@ -727,12 +861,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       created_at: new Date().toISOString(),
     };
     setNotifications((prev) => [newNotif, ...prev]);
+    supabaseService.insertNotification({
+      ...notif,
+      user_id: currentUser.id,
+    }).catch(console.error);
   };
 
   const markAsRead = (id: string) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
+    supabaseService.markNotificationAsRead(id).catch(console.error);
   };
 
   const markAllAsRead = () => {
@@ -746,6 +885,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       created_at: new Date().toISOString(),
     };
     setAnnouncements((prev) => [newAnn, ...prev]);
+    supabaseService.insertAnnouncement({
+      ...item,
+      created_by: currentUser.id,
+    }).catch(console.error);
   };
 
   const deleteAnnouncement = (id: string) => {
@@ -757,6 +900,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (currentUser.id === updatedUser.id) {
       setCurrentUser(updatedUser);
     }
+    supabaseService.upsertProfile(updatedUser).catch(console.error);
   };
 
   const addUser = (newUser: UserProfile) => {
@@ -814,6 +958,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       created_at: new Date().toISOString(),
     };
     setMemories((prev) => [newPhoto, ...prev]);
+    supabaseService.insertHostelMemory({
+      image_url: photoData.image_url,
+      event_name: photoData.category,
+      description: photoData.caption,
+      uploaded_by: currentUser.id,
+      uploaded_by_name: photoData.author_name,
+    }).catch(console.error);
 
     // Notification broadcast
     addNotification({

@@ -2,12 +2,17 @@ export type UserRole = 'student' | 'teacher' | 'management';
 
 export type HostelPosition = 
   | 'Room leader' 
+  | 'Room Leader'
   | 'Floor representative' 
+  | 'Floor Representative'
   | 'Warden' 
   | 'Mess manager' 
+  | 'Mess Manager'
   | 'Admin' 
   | 'Resident' 
-  | 'Faculty Advisor';
+  | 'Faculty Advisor'
+  | 'Faculty'
+  | 'Maintenance Head';
 
 export interface UserProfile {
   id: string;

@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import { UserRole, HostelPosition } from '@/types';
+import { supabaseService } from '@/lib/supabaseService';
 import { 
   User, 
   ShieldCheck, 
@@ -13,21 +15,25 @@ import {
   CheckCircle2, 
   Sparkles,
   KeyRound,
-  RotateCcw
+  RotateCcw,
+  LogOut
 } from 'lucide-react';
 
 const POSITIONS: HostelPosition[] = [
-  'Room leader',
-  'Floor representative',
-  'Warden',
-  'Mess manager',
-  'Admin',
+  'Room Leader',
+  'Floor Representative',
   'Resident',
+  'Warden',
+  'Faculty',
   'Faculty Advisor',
+  'Admin',
+  'Mess Manager',
+  'Maintenance Head',
 ];
 
 export default function ProfilePage() {
-  const { currentUser, setCurrentUser, switchRole } = useApp();
+  const router = useRouter();
+  const { currentUser, setCurrentUser, switchRole, updateUser } = useApp();
   
   const [name, setName] = useState(currentUser.full_name);
   const [age, setAge] = useState(currentUser.age);
@@ -41,17 +47,21 @@ export default function ProfilePage() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    setCurrentUser({
+    const updated = {
       ...currentUser,
       full_name: name,
+      name,
       age: Number(age),
       email,
       phone,
       role,
       position,
+      hostel_position: position,
       room_number: room,
       wing,
-    });
+    };
+    setCurrentUser(updated);
+    if (updateUser) updateUser(updated);
 
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 2000);
@@ -258,12 +268,25 @@ export default function ProfilePage() {
                 <span>Profile updated successfully!</span>
               </span>
             )}
-            <button
-              type="submit"
-              className="ml-auto rounded-xl bg-blue-600 px-6 py-2.5 text-xs font-bold text-white shadow-lg hover:bg-blue-500 transition-colors"
-            >
-              Save Profile Changes
-            </button>
+            <div className="flex items-center gap-3 ml-auto">
+              <button
+                type="button"
+                onClick={async () => {
+                  await supabaseService.signOut();
+                  router.push('/login');
+                }}
+                className="flex items-center gap-1.5 rounded-xl border border-red-500/30 bg-red-950/20 px-4 py-2.5 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                <span>Log Out</span>
+              </button>
+              <button
+                type="submit"
+                className="rounded-xl bg-blue-600 px-6 py-2.5 text-xs font-bold text-white shadow-lg hover:bg-blue-500 transition-colors"
+              >
+                Save Profile Changes
+              </button>
+            </div>
           </div>
         </form>
       </div>
